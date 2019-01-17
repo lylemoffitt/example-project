@@ -6,13 +6,13 @@ project(Hello
 )
 
 # Put together list of all source file
-file(GLOB ${PROJECT_NAME}_SRC
-    "src/*.cpp"
-    "src/**/*.cpp"
+file(GLOB src_files
+    ${PROJECT_SOURCE_DIR}/src/*.cpp
+    ${PROJECT_SOURCE_DIR}/src/**/*.cpp
 )
 
 # Create executable target
-add_executable(${PROJECT_NAME} ${PROJECT_NAME}_SRC)
+add_executable(${PROJECT_NAME} ${src_files})
 
 # Set target include directories
 target_include_directories(${PROJECT_NAME}
@@ -46,14 +46,21 @@ target_compile_options(${PROJECT_NAME}
 # Set compiler features required by this target
 target_compile_features(${PROJECT_NAME} 
     PRIVATE 
-        cxx_std_11
+        # cxx_std_11
 )
 
 # Package must be found before it can be linked
 #   - Execute FindBoost.cmake to get Boost::program_options
 find_package(Boost 1.55 REQUIRED COMPONENTS program_options)
+
 #   - Execute FindPrinter.cmake to get Printer::libPrinter
-find_package(Printer REQUIRED COMPONENTS libPrinter)
+# find_package(Printer REQUIRED COMPONENTS libPrinter)
+
+# Directly build the subdirectory if ithasn't been found
+# if(NOT Printer_FOUND)
+   add_subdirectory(../libPrinter) 
+# endif()
+
 
 # Set target links
 target_link_libraries(${PROJECT_NAME} 

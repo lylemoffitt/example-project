@@ -8,3 +8,5 @@
 # Load the GNUInstallDirs cmake module
 #   - Sets CMAKE_INSTALL_LIBDIR to cononical install location for platform
 include(GNUInstallDirs)
+
+cmake_minimum_required(VERSION 3.0)

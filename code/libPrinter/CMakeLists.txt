@@ -8,13 +8,17 @@ project(lib${MODULE_NAME}
 )
 
 # Put together list of all source files
-file(GLOB ${MODULE_NAME}_SRC
-    "src/*.cpp"
-    "src/**/*.cpp"
+file(GLOB src_files
+    ${PROJECT_SOURCE_DIR}/src/*.cpp
+    ${PROJECT_SOURCE_DIR}/src/**/*.cpp
+    # ${PROJECT_SOURCE_DIR}/src/*.h
+    # ${PROJECT_SOURCE_DIR}/src/**/*.h
+    # ${PROJECT_SOURCE_DIR}/include/*.h
+    # ${PROJECT_SOURCE_DIR}/include/**/*.h
 )
 
 # Create library target
-add_library(${MODULE_NAME} ${MODULE_NAME}_SRC)
+add_library(${MODULE_NAME} SHARED ${src_files})
 
 # Set target include directories
 target_include_directories(${MODULE_NAME}
@@ -51,7 +55,7 @@ target_compile_features(${MODULE_NAME}
     # We require C++11 support and them same applies to consumers since
     #   STL is in our API
     PUBLIC
-        cxx_std_11
+        # cxx_std_11
     
     # Internally we require some compiler features, but we won't require 
     #   upstream consumers to also support them
@@ -67,10 +71,10 @@ install(TARGETS ${MODULE_NAME}
     EXPORT ${PROJECT_NAME}_EXPORT
 
     # Install Destination for libraries (*.so)
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION lib
 
     # Install Destination for archives (*.a)
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION lib
 
     # Install Desination for DLLs
     # RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -82,28 +86,42 @@ install(TARGETS ${MODULE_NAME}
 install(EXPORT ${PROJECT_NAME}_EXPORT # Export ID as defined above
     
     # Name of cmake import script
-    FILE ${PROJECT_NAME}Config.cmake
+    FILE ${MODULE_NAME}Config.cmake
     
     # Namespace to create target under
-    NAMESPACE Printer::
+    NAMESPACE 
+        Printer::
 
     # Directory to place the install script in
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/lib${PROJECT_NAME}
+    DESTINATION 
+        # ${CMAKE_INSTALL_LIBDIR}/cmake/lib${PROJECT_NAME}
+        # share/${PROJECT_NAME}/cmake
+        cmake
 )
 
 # Add directory to list of exports for the module
 install(DIRECTORY include/
 
     # Install folders to system include directory
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    DESTINATION include
 )
 
 
 # This makes the project importable from the install directory
 # Put config file in per-project dir (name MUST match), can also
-# just go into 'cmake'.
-install(EXPORT ${PROJECT_NAME}Config DESTINATION share/${PROJECT_NAME}/cmake)
+# # just go into 'cmake'.
+# install(EXPORT ${PROJECT_NAME}Config 
+    # DESTINATION share/${PROJECT_NAME}/cmake)
 
 # This makes the project importable from the build directory
-export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_NAME}Config.cmake)
+export(TARGETS ${PROJECT_NAME}_EXPORT
+    FILE ${MODULE_NAME}Config.cmake)
 
+
+
+    # get_cmake_property(_variableNames VARIABLES)
+    # list (SORT _variableNames)
+    # foreach (_variableName ${_variableNames})
+    #     message(STATUS "${_variableName}=${${_variableName}}")
+    # endforeach()
+    

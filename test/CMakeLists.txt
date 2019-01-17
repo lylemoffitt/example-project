@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(Hello
+project(Test
     VERSION 1.0.0 
     LANGUAGES CXX
 )
 
 # Put together list of all source file
-file(GLOB ${PROJECT_NAME}_SRC
-    "src/*.cpp"
-    "src/**/*.cpp"
+file(GLOB src_files
+    ${PROJECT_SOURCE_DIR}/src/*.cpp
+    ${PROJECT_SOURCE_DIR}/src/**/*.cpp
 )
 
 # Create executable target
-add_executable(${PROJECT_NAME} ${PROJECT_NAME}_SRC)
+add_executable(${PROJECT_NAME} ${src_files})
 
 # Set target include directories
 target_include_directories(${PROJECT_NAME}
@@ -46,7 +46,7 @@ target_compile_options(${PROJECT_NAME}
 # Set compiler features required by this target
 target_compile_features(${PROJECT_NAME} 
     PRIVATE 
-        cxx_std_11
+        # cxx_std_11
 )
 
 enable_testing()
@@ -55,9 +55,27 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 # Package must be found before it can be linked
 #   - Execute FindGTest.cmake
-find_package(GTest REQUIRED)
-#   - Execute FindPrinter.cmake to get Printer::libPrinter
-find_package(Printer REQUIRED COMPONENTS libPrinter)
+find_package(GTest)
+
+if( NOT GTest_FOUND)
+
+    # add_subdirectory(../submodules/googletest)
+    add_subdirectory(deps/gtest)
+
+endif()
+
+
+# Execute FindPrinter.cmake to get Printer::libPrinter
+# find_package(Printer REQUIRED COMPONENTS libPrinter)
+
+# Execute FindPrinter.cmake to get Printer::libPrinter
+# find_package(Printer COMPONENTS Printer)
+
+# Directly build the subdirectory if ithasn't been found
+if(NOT Printer_FOUND)
+    # add_subdirectory(../code/libPrinter) 
+    add_subdirectory(deps/libPrinter) 
+endif()
 
 # Set target links
 target_link_libraries(${PROJECT_NAME} 
@@ -68,6 +86,7 @@ target_link_libraries(${PROJECT_NAME}
     
     # Targets to link against privately
     PRIVATE
-        Boost::program_options
-        Printer::libPrinter
+        # Boost::program_options
+        # Printer::Printer
+        libPrinter
 )

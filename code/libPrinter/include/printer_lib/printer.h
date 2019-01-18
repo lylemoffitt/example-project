@@ -5,11 +5,11 @@
 #include <string>
 
 
-class printer{
+class Printer{
     std::ostream & _ostr;
 
 public:
-    printer(std::ostream & ostr);
+    Printer(std::ostream & ostr);
 
     void print(std::string str);
 };

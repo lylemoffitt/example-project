@@ -6,12 +6,12 @@
 
 namespace {
 
-TEST(HelloTest, Negative) {
+TEST(HelloTest, print_hello_get_hello) {
     std::stringstream ss;
     Printer printer(ss);
     printer.print("hello");
 
-    EXPECT_STREQ("hello", ss.str().c_str());
+    EXPECT_STREQ("hello\n", ss.str().c_str());
 }
 
 } // namespace

@@ -5,10 +5,19 @@ project(Hello
     LANGUAGES CXX
 )
 
+
+message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
+message("CMAKE_SOURCE_DIR           : " ${CMAKE_SOURCE_DIR})
+message("CMAKE_INSTALL_PREFIX       : " ${CMAKE_INSTALL_PREFIX})
+message("CMAKE_CURRENT_SOURCE_DIR   : " ${CMAKE_CURRENT_SOURCE_DIR})
+message("PROJECT_BINARY_DIR         : " ${PROJECT_BINARY_DIR})
+message("PROJECT_SOURCE_DIR         : " ${PROJECT_SOURCE_DIR})
+
+
 # Put together list of all source file
 file(GLOB src_files
-    ${PROJECT_SOURCE_DIR}/src/*.cpp
-    ${PROJECT_SOURCE_DIR}/src/**/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
 )
 
 # Create executable target
@@ -27,14 +36,17 @@ target_include_directories(${PROJECT_NAME}
     #   - Populates INCLUDE_DIRECTORIES
     #   - Populates INTERFACE_INCLUDE_DIRECTORIES
     PUBLIC
-        $<INSTALL_INTERFACE:include>
+        # $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:include/${TARGET}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-
+        
     # Properties that are hidden from the consumer.
     #   - Available under the PRIVATE_ prefix
     #   - Populates INCLUDE_DIRECTORIES
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        # ${CMAKE_CURRENT_SOURCE_DIR}/src
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        # $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
 # Set compiler options for this target
@@ -44,6 +56,7 @@ target_compile_options(${PROJECT_NAME}
 )
 
 # Set compiler features required by this target
+# https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
 target_compile_features(${PROJECT_NAME} 
     PRIVATE 
         # cxx_std_11
@@ -56,10 +69,12 @@ find_package(Boost 1.55 REQUIRED COMPONENTS program_options)
 #   - Execute FindPrinter.cmake to get Printer::libPrinter
 # find_package(Printer REQUIRED COMPONENTS libPrinter)
 
-# Directly build the subdirectory if ithasn't been found
-# if(NOT Printer_FOUND)
-   add_subdirectory(../libPrinter) 
-# endif()
+# Directly build the subdirectory if it hasn't been found
+if(NOT Printer_FOUND)
+    message(STATUS 
+        "libPrinter NOT FOUND: reverting to add_subdirectory")
+    add_subdirectory(deps/libPrinter) 
+endif()
 
 
 # Set target links
@@ -72,5 +87,6 @@ target_link_libraries(${PROJECT_NAME}
     # Targets to link against privately
     PRIVATE
         Boost::program_options
-        Printer::libPrinter
+        # libPrinter
+        Printer
 )

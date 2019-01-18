@@ -33,7 +33,11 @@ int main(int argc, char** argv) {
             printer.print(greeting + argv[1]);
         }
     } catch (po::error& e) {
-        std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+        std::cerr 
+            << "ERROR: " 
+            << e.what() 
+            << std::endl 
+            << std::endl;
         std::cerr << desc << std::endl;
         return 1;
     } catch(std::exception& e) 

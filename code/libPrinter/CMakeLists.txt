@@ -80,33 +80,54 @@ target_include_directories(${TARGET}
 )
 
 # Set compiler options for this target
-target_compile_options(${TARGET} 
-    PRIVATE 
+target_compile_options(${PROJECT_NAME} 
+    # Compilation options passed on to consumers
+    PUBLIC
+    # Compilation options for this target only
+    PRIVATE
+        # Always use the flags
         -Werror
+        # Use these flags when compiling in debug mode
+        $<$<CONFIG:DEBUG>: 
+            -O0 -g3 -ggdb 
+        >
+        # Use these flags when compiling in release mode
+        $<$<CONFIG:RELEASE>:
+            -O2 
+        >
 )
 
 # Set compiler features required by this target
+#   - Implicitly defines compiler version based on feature support
 # https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
 target_compile_features(${TARGET}
 
-    # We require C++11 support and them same applies to consumers since
-    #   STL is in our API
+    # Compiler featues we require of upstream consumers
     PUBLIC
-        # cxx_std_11
+        # cxx_std_11  # req. cmake v3.8
     
-    # Internally we require some compiler features, but we won't require 
-    #   upstream consumers to also support them
+    # Internally we require some compiler features
     PRIVATE
         cxx_auto_type
         cxx_variadic_templates
 )
 
+# Set compiler properties for this target
+#   - Explicitly set compiler version and other properties
+# https://cmake.org/cmake/help/v3.4/manual/cmake-properties.7.html#target-properties
+set_target_properties(${TARGET} 
+    PROPERTIES
+        CXX_STANDARD 11
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+)
+
 # Define veriable for the target compilation
 target_compile_definitions(${TARGET}
-    PRIVATE
+    PUBLIC
+        # Compile library such that it appends an endline
         APPEND_ENDLINE=1
 ) 
-
 
 # Add target to the list of exports for the module
 install(TARGETS ${TARGET}

@@ -5,7 +5,8 @@ project(Test
     LANGUAGES CXX
 )
 
-set (CMAKE_CXX_STANDARD 14)
+# Require all target
+# set (CMAKE_CXX_STANDARD 14)
 
 message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
 message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})
@@ -53,26 +54,53 @@ target_include_directories(${PROJECT_NAME}
 
 # Set compiler options for this target
 target_compile_options(${PROJECT_NAME} 
-    PRIVATE 
+    # Compilation options passed on to consumers
+    PUBLIC
+    # Compilation options for this target only
+    PRIVATE
+        # Always use the flags
         -Werror
+        # Use these flags when compiling in debug mode
+        $<$<CONFIG:DEBUG>: 
+            -O0 -g3 -ggdb 
+        >
+        # Use these flags when compiling in release mode
+        $<$<CONFIG:RELEASE>:
+            -O2 
+        >
 )
 
+
 # Set compiler features required by this target
+#   - Implicitly defines compiler version based on feature support
 # https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
 target_compile_features(${PROJECT_NAME} 
     PRIVATE 
-        # cxx_std_11
+        # cxx_std_11 # req. cmake v3.8
+)
+
+# Set compiler properties for this target
+#   - Explicitly set compiler version and other properties
+# https://cmake.org/cmake/help/v3.4/manual/cmake-properties.7.html#target-properties
+set_target_properties(${PROJECT_NAME} 
+    PROPERTIES
+        CXX_STANDARD 11
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
 )
 
 enable_testing()
-include_directories(${GTEST_INCLUDE_DIRS})
+# include_directories(${GTEST_INCLUDE_DIRS})
 
 
 # Package must be found before it can be linked
 #   - Execute FindGTest.cmake
 find_package(GTest QUIET)
 
-if( NOT GTest_FOUND)
+# Conditially build the package inline if:
+#   - Not resolved by find_package
+#   - Not already build as part of another package
+if( NOT GTest_FOUND AND NOT TARGET gtest_main)
     # add_subdirectory(../submodules/googletest)
     add_subdirectory(deps/gtest)
 
@@ -92,10 +120,8 @@ endif()
 
 # Set target links
 target_link_libraries(${PROJECT_NAME} 
-    
     # Targets links to expose to callers
     PUBLIC
-        # Target with interface exposed in header
     
     # Targets to link against privately
     PRIVATE
@@ -105,11 +131,31 @@ target_link_libraries(${PROJECT_NAME}
         gtest_main
 )
 
+# Get compiler definition for target
+#   - Only get definitions that were defined INTERFACE or PUBLIC
+get_target_property(printer_CC_DEF_INTERFACE Printer::Printer
+    INTERFACE_COMPILE_DEFINITIONS
+)
+
+# Get compiler definition for target
+#   - Only get definitions that were defined PUBLIC or PRIVATE
+get_target_property(printer_CC_DEF_PRIVATE Printer::Printer
+    COMPILE_DEFINITIONS
+)
+
+# Define veriable for the target compilation
+#   - Propogate compilation defintions
+target_compile_definitions(${PROJECT_NAME}
+    INTERFACE
+        ${printer_CC_DEF_INTERFACE}
+    PRIVATE
+        ${printer_CC_DEF_PRIVATE}
+) 
 
 
-    # get_cmake_property(_variableNames VARIABLES)
-    # list (SORT _variableNames)
-    # foreach (_variableName ${_variableNames})
-    #     message(STATUS "${_variableName}=${${_variableName}}")
-    # endforeach()
+    get_cmake_property(_variableNames VARIABLES)
+    list (SORT _variableNames)
+    foreach (_variableName ${_variableNames})
+        message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
     

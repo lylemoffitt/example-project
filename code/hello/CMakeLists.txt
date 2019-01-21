@@ -51,8 +51,38 @@ target_include_directories(${PROJECT_NAME}
 
 # Set compiler options for this target
 target_compile_options(${PROJECT_NAME} 
-    PRIVATE 
+    # Compilation options passed on to consumers
+    PUBLIC
+    # Compilation options for this target only
+    PRIVATE
+        # Always use the flags
         -Werror
+        # Use these flags when compiling in debug mode
+        $<$<CONFIG:DEBUG>: 
+            -O0 -g3 -ggdb 
+        >
+        # Use these flags when compiling in release mode
+        $<$<CONFIG:RELEASE>:
+            -O2 
+        >
+)
+
+# Set compiler features required by this target
+#   - Implicitly defines compiler version based on feature support
+# https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
+target_compile_features(${PROJECT_NAME} 
+    PRIVATE 
+        # cxx_std_11 # req. cmake v3.8
+)
+
+# Set compiler properties for this target
+#   - Explicitly set compiler version and other properties
+# https://cmake.org/cmake/help/v3.4/manual/cmake-properties.7.html#target-properties
+set_target_properties(${PROJECT_NAME} 
+    PROPERTIES
+        CXX_STANDARD 11
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
 )
 
 # Define veriable for the target compilation
@@ -65,8 +95,8 @@ target_compile_definitions(${PROJECT_NAME}
 # https://cmake.org/cmake/help/v3.1/prop_gbl/CMAKE_CXX_KNOWN_FEATURES.html
 target_compile_features(${PROJECT_NAME} 
     PRIVATE 
-        # cxx_std_11
-)
+        # cxx_std_11  # req. cmake v3.8
+    )
 
 # Package must be found before it can be linked
 #   - Execute FindBoost.cmake to get Boost::program_options
@@ -93,7 +123,6 @@ target_link_libraries(${PROJECT_NAME}
     # Targets to link against privately
     PRIVATE
         Boost::program_options
-        # libPrinter
         # Printer
         Printer::Printer
 )

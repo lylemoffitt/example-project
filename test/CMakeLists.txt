@@ -7,6 +7,14 @@ project(Test
 
 set (CMAKE_CXX_STANDARD 14)
 
+message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
+message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})
+message("CMAKE_INSTALL_PREFIX       : " ${CMAKE_INSTALL_PREFIX})
+message("CMAKE_SOURCE_DIR           : " ${CMAKE_SOURCE_DIR})
+message("CMAKE_CURRENT_SOURCE_DIR   : " ${CMAKE_CURRENT_SOURCE_DIR})
+message("PROJECT_BINARY_DIR         : " ${PROJECT_BINARY_DIR})
+message("PROJECT_SOURCE_DIR         : " ${PROJECT_SOURCE_DIR})
+
 
 # Put together list of all source file
 file(GLOB src_files
@@ -31,7 +39,6 @@ target_include_directories(${PROJECT_NAME}
     #   - Populates INTERFACE_INCLUDE_DIRECTORIES
     PUBLIC
         $<INSTALL_INTERFACE:include>
-        # $<INSTALL_INTERFACE:include/${TARGET}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 
     # Properties that are hidden from the consumer.
@@ -40,7 +47,7 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE
         # ${CMAKE_CURRENT_SOURCE_DIR}/src
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+        # $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 
 )
 
@@ -73,14 +80,14 @@ endif()
 
 
 
-# Execute FindPrinter.cmake to get Printer::libPrinter
+# Execute FindPrinter.cmake to get Printer::Printer
 find_package(Printer QUIET COMPONENTS Printer)
 
 # Directly build the subdirectory if it hasn't been found
 if(NOT Printer_FOUND)
-    message(WARNING "libPrinter NOT FOUND: reverting to add_subdirectory")
+    message(STATUS 
+        "libPrinter NOT FOUND: reverting to add_subdirectory")
     add_subdirectory(deps/libPrinter) 
-    # find_package(Printer REQUIRED COMPONENTS Printer)
 endif()
 
 # Set target links
@@ -92,10 +99,9 @@ target_link_libraries(${PROJECT_NAME}
     
     # Targets to link against privately
     PRIVATE
-        # Boost::program_options
-        # Printer::Printer
-        # libPrinter
-        Printer
+        # Name of the printer library
+        Printer::Printer
+        # Printer # Not generic
         gtest_main
 )
 

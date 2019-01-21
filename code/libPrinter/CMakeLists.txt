@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
+set(NAMESPACE Printer)
+
 # The name for this module of the project
 set(TARGET Printer)
 project(lib${TARGET}
@@ -7,9 +9,15 @@ project(lib${TARGET}
     LANGUAGES CXX
 )
 
+# Include guard prevents double definition of target
+if(TARGET ${TARGET})
+    return()
+endif()
+
 message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
-message("CMAKE_SOURCE_DIR           : " ${CMAKE_SOURCE_DIR})
+message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})
 message("CMAKE_INSTALL_PREFIX       : " ${CMAKE_INSTALL_PREFIX})
+message("CMAKE_SOURCE_DIR           : " ${CMAKE_SOURCE_DIR})
 message("CMAKE_CURRENT_SOURCE_DIR   : " ${CMAKE_CURRENT_SOURCE_DIR})
 message("PROJECT_BINARY_DIR         : " ${PROJECT_BINARY_DIR})
 message("PROJECT_SOURCE_DIR         : " ${PROJECT_SOURCE_DIR})
@@ -32,14 +40,18 @@ file(GLOB_RECURSE header_files
 
 # Set directories to include for this project
 #   - Needed for any project which usesthis one via add_subdirectory
-include_directories(
-    # include
-    # ${PROJECT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+# include_directories(
+#     # include
+#     # ${PROJECT_SOURCE_DIR}/include
+#     ${CMAKE_CURRENT_SOURCE_DIR}/include
+# )
 
 # Create library target
+#   - Define the target name and it's build sources
+#   - Include sources will be auto-generated with gcc -MMD
 add_library(${TARGET} SHARED ${src_files})
+#   - Alias the target under the module namespace
+add_library(${NAMESPACE}::${TARGET} ALIAS ${TARGET})
 
 # Set target include directories
 target_include_directories(${TARGET}
@@ -89,6 +101,12 @@ target_compile_features(${TARGET}
         cxx_variadic_templates
 )
 
+# Define veriable for the target compilation
+target_compile_definitions(${TARGET}
+    PRIVATE
+        APPEND_ENDLINE=1
+) 
+
 
 # Add target to the list of exports for the module
 install(TARGETS ${TARGET}
@@ -120,7 +138,7 @@ install(EXPORT ${TARGET}Config # Export ID as defined above
     
     # Namespace to create target under
     NAMESPACE 
-        Printer::
+        ${NAMESPACE}::
 
     # Directory to place the install script in
     DESTINATION 

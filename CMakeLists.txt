@@ -9,4 +9,9 @@
 #   - Sets CMAKE_INSTALL_LIBDIR to cononical install location for platform
 include(GNUInstallDirs)
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
+
+
+add_subdirectory(code/hello)
+add_subdirectory(code/libPrinter)
+add_subdirectory(test)

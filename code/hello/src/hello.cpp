@@ -7,14 +7,19 @@
 #include <boost/program_options.hpp>
 namespace po =  boost::program_options;
 
+#ifndef HELLO_STRING
+#define HELLO_STRING "hello"
+#endif
+
 std::string usage() {
     std::string ret("usage: ");
-    ret += "\thello [thing]";
+    ret += "\t hello [thing]";
     return ret;
 }
 
 int main(int argc, char** argv) {
-    std::string greeting("Hello ");
+    std::string greeting( HELLO_STRING );
+    std::string greeted( argc>1 ? argv[1] : "you");
 
     po::options_description desc("Allowed options");
     desc.add_options()
@@ -30,7 +35,7 @@ int main(int argc, char** argv) {
             return 0;
         } else {
             
-            printer.print(greeting + argv[1]);
+            printer.print(greeting + greeted);
         }
     } catch (po::error& e) {
         std::cerr 

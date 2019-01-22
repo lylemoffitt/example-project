@@ -5,8 +5,11 @@ project(Test
     LANGUAGES CXX
 )
 
-# Require all target
-# set (CMAKE_CXX_STANDARD 14)
+# Look for modules in the current build directory
+set(CMAKE_MODULE_PATH 
+    ${CMAKE_MODULE_PATH}
+    ${CMAKE_BINARY_DIR}
+)
 
 message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
 message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})
@@ -153,9 +156,9 @@ target_compile_definitions(${PROJECT_NAME}
 ) 
 
 
-    get_cmake_property(_variableNames VARIABLES)
-    list (SORT _variableNames)
-    foreach (_variableName ${_variableNames})
-        message(STATUS "${_variableName}=${${_variableName}}")
-    endforeach()
+    # get_cmake_property(_variableNames VARIABLES)
+    # list (SORT _variableNames)
+    # foreach (_variableName ${_variableNames})
+    #     message(STATUS "${_variableName}=${${_variableName}}")
+    # endforeach()
     

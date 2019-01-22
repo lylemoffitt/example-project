@@ -80,7 +80,7 @@ target_include_directories(${TARGET}
 )
 
 # Set compiler options for this target
-target_compile_options(${PROJECT_NAME} 
+target_compile_options(${TARGET} 
     # Compilation options passed on to consumers
     PUBLIC
     # Compilation options for this target only
@@ -164,7 +164,7 @@ install(EXPORT ${TARGET}Config # Export ID as defined above
     # Directory to place the install script in
     DESTINATION 
         # ${CMAKE_INSTALL_LIBDIR}/cmake/lib${PROJECT_NAME}
-        # share/${PROJECT_NAME}/cmake
+        # share/${TARGET}/cmake
         cmake
 )
 

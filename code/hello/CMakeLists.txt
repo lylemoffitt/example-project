@@ -5,6 +5,11 @@ project(Hello
     LANGUAGES CXX
 )
 
+# Look for modules in the current build directory
+set(CMAKE_MODULE_PATH 
+    ${CMAKE_MODULE_PATH}
+    ${CMAKE_BINARY_DIR}
+)
 
 message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
 message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})

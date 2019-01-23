@@ -5,16 +5,12 @@ project(Test
     LANGUAGES CXX
 )
 
-# Look for modules in the current build directory
-set(CMAKE_MODULE_PATH 
-    ${CMAKE_MODULE_PATH}
-    ${CMAKE_BINARY_DIR}
-)
 
 message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
 message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})
 message("CMAKE_INSTALL_PREFIX       : " ${CMAKE_INSTALL_PREFIX})
 message("CMAKE_SOURCE_DIR           : " ${CMAKE_SOURCE_DIR})
+message("CMAKE_BINARY_DIR           : " ${CMAKE_BINARY_DIR})
 message("CMAKE_CURRENT_SOURCE_DIR   : " ${CMAKE_CURRENT_SOURCE_DIR})
 message("PROJECT_BINARY_DIR         : " ${PROJECT_BINARY_DIR})
 message("PROJECT_SOURCE_DIR         : " ${PROJECT_SOURCE_DIR})
@@ -27,6 +23,7 @@ file(GLOB src_files
 )
 
 # Create executable target
+#   - headers will be discoved through includes
 add_executable(${PROJECT_NAME} ${src_files})
 
 # Set target include directories
@@ -49,7 +46,6 @@ target_include_directories(${PROJECT_NAME}
     #   - Available under the PRIVATE_ prefix
     #   - Populates INCLUDE_DIRECTORIES
     PRIVATE
-        # ${CMAKE_CURRENT_SOURCE_DIR}/src
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
         # $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 
@@ -62,7 +58,8 @@ target_compile_options(${PROJECT_NAME}
     # Compilation options for this target only
     PRIVATE
         # Always use the flags
-        -Werror
+        # -Werror
+        -fdiagnostics-show-location=once
         # Use these flags when compiling in debug mode
         $<$<CONFIG:DEBUG>: 
             -O0 -g3 -ggdb 
@@ -105,7 +102,7 @@ find_package(GTest QUIET)
 #   - Not already build as part of another package
 if( NOT GTest_FOUND AND NOT TARGET gtest_main)
     # add_subdirectory(../submodules/googletest)
-    add_subdirectory(deps/gtest)
+    add_subdirectory(deps/gtest gtest)
 
 endif()
 
@@ -115,11 +112,15 @@ endif()
 find_package(Printer QUIET COMPONENTS Printer)
 
 # Directly build the subdirectory if it hasn't been found
-if(NOT Printer_FOUND)
+if(Printer_FOUND)
+    message(STATUS 
+        "libPrinter FOUND: successful find_package")
+else()
     message(STATUS 
         "libPrinter NOT FOUND: reverting to add_subdirectory")
-    add_subdirectory(deps/libPrinter) 
+    add_subdirectory(deps/libPrinter code/libPrinter) 
 endif()
+
 
 # Set target links
 target_link_libraries(${PROJECT_NAME} 
@@ -130,7 +131,6 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         # Name of the printer library
         Printer::Printer
-        # Printer # Not generic
         gtest_main
 )
 
@@ -155,10 +155,11 @@ target_compile_definitions(${PROJECT_NAME}
         ${printer_CC_DEF_PRIVATE}
 ) 
 
-
-    # get_cmake_property(_variableNames VARIABLES)
-    # list (SORT _variableNames)
-    # foreach (_variableName ${_variableNames})
-    #     message(STATUS "${_variableName}=${${_variableName}}")
-    # endforeach()
+# Add target to the list of exports for the module
+install(TARGETS ${PROJECT_NAME}
     
+    # Install Desination for DLLs
+    # RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    RUNTIME DESTINATION bin
+
+)

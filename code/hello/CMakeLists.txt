@@ -5,20 +5,25 @@ project(Hello
     LANGUAGES CXX
 )
 
-# Look for modules in the current build directory
-set(CMAKE_MODULE_PATH 
-    ${CMAKE_MODULE_PATH}
-    ${CMAKE_BINARY_DIR}
-)
 
 message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
 message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})
 message("CMAKE_INSTALL_PREFIX       : " ${CMAKE_INSTALL_PREFIX})
 message("CMAKE_SOURCE_DIR           : " ${CMAKE_SOURCE_DIR})
+message("CMAKE_BINARY_DIR           : " ${CMAKE_BINARY_DIR})
 message("CMAKE_CURRENT_SOURCE_DIR   : " ${CMAKE_CURRENT_SOURCE_DIR})
 message("PROJECT_BINARY_DIR         : " ${PROJECT_BINARY_DIR})
 message("PROJECT_SOURCE_DIR         : " ${PROJECT_SOURCE_DIR})
 
+
+# Configuration options for this project
+#   - These options will be exposed in ccmake or cmake-gui
+#   - Strings are stored unquoted
+set(opt_${PROJECT_NAME}_greet_string
+    "hello" # Defualt value
+    CACHE STRING
+    "String to use as greeeting."
+)
 
 # Put together list of all source file
 file(GLOB src_files
@@ -30,6 +35,7 @@ file(GLOB src_files
 add_executable(${PROJECT_NAME} ${src_files})
 
 # Set target include directories
+#   - headers will be discoved through includes
 target_include_directories(${PROJECT_NAME}
 
     # Properties that are exposed to the consumer. 
@@ -93,7 +99,9 @@ set_target_properties(${PROJECT_NAME}
 # Define veriable for the target compilation
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
-        HELLO_STRING="goodbye"
+        # Pass configuration options to compiler
+        #   - Must quote to preserve string
+        HELLO_STRING="${opt_${PROJECT_NAME}_greet_string}"
 ) 
 
 # Set compiler features required by this target
@@ -111,10 +119,13 @@ find_package(Boost 1.55 REQUIRED COMPONENTS program_options)
 find_package(Printer QUIET COMPONENTS Printer)
 
 # Directly build the subdirectory if it hasn't been found
-if(NOT Printer_FOUND)
+if(Printer_FOUND)
+    message(STATUS 
+        "libPrinter FOUND: successful find_package")
+else()
     message(STATUS 
         "libPrinter NOT FOUND: reverting to add_subdirectory")
-    add_subdirectory(deps/libPrinter) 
+    add_subdirectory(deps/libPrinter code/libPrinter) 
 endif()
 
 
@@ -128,6 +139,14 @@ target_link_libraries(${PROJECT_NAME}
     # Targets to link against privately
     PRIVATE
         Boost::program_options
-        # Printer
         Printer::Printer
+)
+
+# Add target to the list of exports for the module
+install(TARGETS ${PROJECT_NAME}
+    
+    # Install Desination for DLLs
+    # RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    RUNTIME DESTINATION bin
+
 )

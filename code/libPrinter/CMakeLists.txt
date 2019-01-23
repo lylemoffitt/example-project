@@ -18,33 +18,26 @@ message("CMAKE_MODULE_PATH          : " ${CMAKE_MODULE_PATH})
 message("CMAKE_PREFIX_PATH          : " ${CMAKE_PREFIX_PATH})
 message("CMAKE_INSTALL_PREFIX       : " ${CMAKE_INSTALL_PREFIX})
 message("CMAKE_SOURCE_DIR           : " ${CMAKE_SOURCE_DIR})
+message("CMAKE_BINARY_DIR           : " ${CMAKE_BINARY_DIR})
 message("CMAKE_CURRENT_SOURCE_DIR   : " ${CMAKE_CURRENT_SOURCE_DIR})
 message("PROJECT_BINARY_DIR         : " ${PROJECT_BINARY_DIR})
 message("PROJECT_SOURCE_DIR         : " ${PROJECT_SOURCE_DIR})
+
+# Configuration options for this project
+#   - These options will be exposed in ccmake or cmake-gui
+#   - Boolean will be passed literally as 'ON' or 'OFF'
+set(opt_${TARGET}_with_newline
+    ON # Defualt value
+    CACHE BOOL
+    "Append newline to every call to printer."
+)
 
 # Put together list of all source files
 file(GLOB src_files
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
-    # ${PROJECT_SOURCE_DIR}/src/*.h
-    # ${PROJECT_SOURCE_DIR}/src/**/*.h
-    # ${PROJECT_SOURCE_DIR}/include/*.h
-    # ${PROJECT_SOURCE_DIR}/include/**/*.h
 )
 
-file(GLOB_RECURSE header_files 
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h*
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/**/*.h*
-)
-
-
-# Set directories to include for this project
-#   - Needed for any project which usesthis one via add_subdirectory
-# include_directories(
-#     # include
-#     # ${PROJECT_SOURCE_DIR}/include
-#     ${CMAKE_CURRENT_SOURCE_DIR}/include
-# )
 
 # Create library target
 #   - Define the target name and it's build sources
@@ -67,7 +60,6 @@ target_include_directories(${TARGET}
     #   - Populates INTERFACE_INCLUDE_DIRECTORIES
     PUBLIC
         $<INSTALL_INTERFACE:include>
-        # $<INSTALL_INTERFACE:include/${TARGET}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 
     # Properties that are hidden from the consumer.
@@ -76,7 +68,6 @@ target_include_directories(${TARGET}
     PRIVATE
         # ${CMAKE_CURRENT_SOURCE_DIR}/src
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        # $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
 # Set compiler options for this target
@@ -125,8 +116,10 @@ set_target_properties(${TARGET}
 # Define veriable for the target compilation
 target_compile_definitions(${TARGET}
     PUBLIC
-        # Compile library such that it appends an endline
-        APPEND_ENDLINE=1
+        # Compile library such that it (optionally) 
+        # appends an endline
+        #   - Convert option from {ON,OFF} to {1,0}
+        APPEND_ENDLINE=$<BOOL:${opt_${TARGET}_with_newline}>
 ) 
 
 # Add target to the list of exports for the module
@@ -151,7 +144,8 @@ install(TARGETS ${TARGET}
 )
 
 # Install the exported target
-#   - Creates libPrinterTargets.cmake
+#   - Creates PrinterConfig.cmake
+#   - Target will be picked up if CMAKE_MODULE_PATH contains CMAKE_INSTALL_PATH
 install(EXPORT ${TARGET}Config # Export ID as defined above
     
     # Name of cmake import script
@@ -168,33 +162,38 @@ install(EXPORT ${TARGET}Config # Export ID as defined above
         cmake
 )
 
-# Install the header files. 
-# The DESTINATION should match with the INSTALL_INTERFACE above.
-install(FILES ${header_files}
-     DESTINATION include/${TARGET}
-)
-
 # Add directory to list of exports for the module
 install(DIRECTORY include/
 
     # Install folders to system include directory
-    DESTINATION include/${TARGET}
+    DESTINATION 
+        # include/${TARGET}
+        include
 )
 
-
-# This makes the project importable from the install directory
-# Put config file in per-project dir (name MUST match), can also
-# # just go into 'cmake'.
-# install(EXPORT ${TARGET}Config 
-#     DESTINATION share/${TARGET}/cmake
-# )
 
 # This makes the project importable from the build directory
 export(TARGETS ${TARGET}
     FILE ${TARGET}Config.cmake
 )
 
+# Import some extra tools to help with writing a version file
+include(CMakePackageConfigHelpers)
 
+# Write a version compatability file to assist in package selection
+write_basic_package_version_file(
+    # Name of the version file
+    ${TARGET}ConfigVersion.cmake
+
+    # Version to write to the file
+    VERSION ${PROJECT_VERSION}
+
+    # Specify how much requested version can differ from provided
+    #   - Requires the major version code matches
+    COMPATIBILITY SameMajorVersion
+)
+
+# Print out all the variables, can also be done with 'cmake -LA'
 
     # get_cmake_property(_variableNames VARIABLES)
     # list (SORT _variableNames)

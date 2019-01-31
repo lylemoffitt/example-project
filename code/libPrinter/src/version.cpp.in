@@ -1,49 +1,99 @@
 #include "printer_lib/version.h"
 
+/* Version information string to be encoded in the BSS data segment.
+
+This information can be later extracted with `strings`. To parse out 
+the JSON encoded metadata use a `sed` script. Ex:
+ 
+    # Select lines between META tags
+    /META_BEGIN/,/META_END/ {
+        # Delete tags
+        /META_BEGIN/ d
+        /META_END/ d
+        # Print remainder
+        p
+    }
+*/
+static const char * VERSION_BLOCK =
+"META_BEGIN\n"
+"{"
+    "\"project\":{"
+        "\"name\":\"@PROJECT_NAME@\","
+        "\"version\":\"@PROJECT_VERSION@\""
+    "},"
+    "\"git\":{"
+        "\"url\":\"@GIT_REMOTE_URL@\","
+        "\"branch\":\"@GIT_BRANCH@\","
+        "\"commit\":\"@GIT_HASH@\","
+        "\"description\":\"@GIT_DESC@\","
+        "\"dirty\":@GIT_DIRTY@"
+    "}"
+"}"
+"\nMETA_END"
+;
 
 
-constexpr static const char * SEMVER = 
-    "@libPrinter_VERSION@";
+constexpr 
+project_version::project_version(){
 
-constexpr static const char * GIT_HASH = 
-    "@GIT_HASH@";
-constexpr static const char * GIT_HASH_SHORT = 
-    "@GIT_HASH_SHORT@";
-constexpr static const char * GIT_DESC = 
-    "@GIT_DESC@";
-
-constexpr static const char * VERSION_STRING_LONG = 
-    "@PROJECT_NAME@-@libPrinter_VERSION@-@GIT_HASH@";
-constexpr static const char * VERSION_STRING_SHORT = 
-    "@PROJECT_NAME@-@libPrinter_VERSION@-@GIT_HASH_SHORT@";
-constexpr static const char * VERSION_DESC = 
-    "@PROJECT_NAME@-@GIT_DESC@";
-
-constexpr const char * 
-version::semver(){
-    return "@libPrinter_VERSION@";
 }
 
-constexpr const char * 
-version::hash(){
-    return "@GIT_HASH@";
+constexpr const char *
+project_version::name(){
+    return "@PROJECT_NAME@";
 }
 
-constexpr const char * 
-version::short_hash(){
-    return "@GIT_HASH_SHORT@";
+constexpr const char *
+project_version::semver(){
+    return "@PROJECT_VERSION@";
 }
 
-constexpr const char * 
-version::git_desc(){
+constexpr project_version::version_data 
+project_version::data(){
+    return version_data{
+        .name   = name(),
+        .major  = @PROJECT_VERSION_MAJOR@,
+        .minor  = @PROJECT_VERSION_MINOR@,
+        .patch  = @PROJECT_VERSION_PATCH@,
+    };
+}
+
+
+constexpr
+git_version::git_version(){
+}
+
+constexpr const char *
+git_version::desc(){
     return "@GIT_DESC@";
 }
 
-constexpr version::version_t 
-version::version(){
-    return version_t{
-        .major = @libPrinter_VERSION_MAJOR@,
-        .minor = @libPrinter_VERSION_MINOR@,
-        .patch = @libPrinter_VERSION_PATCH@
+constexpr const char *
+git_version::url(){
+    return "@GIT_REMOTE_URL@";
+}
+
+constexpr const char *
+git_version::branch(){
+    return "@GIT_BRANCH@";
+}
+
+constexpr const char *
+git_version::hash(){
+    return "@GIT_HASH@";
+}
+
+constexpr const bool
+git_version::dirty(){
+    return @GIT_DIRTY@;
+}
+
+constexpr git_version::git_data 
+git_version::data(){
+    return git_data{
+        .url    = url(),
+        .branch = branch(),
+        .hash   = hash(),
+        .dirty  = dirty(),
     };
 }

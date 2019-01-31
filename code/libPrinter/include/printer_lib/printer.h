@@ -4,7 +4,9 @@
 #include <ostream>
 #include <string>
 
-#include "printer_lib/version.h"
+#include <printer_lib/version.h>
+
+namespace printer {
 
 class Printer{
     std::ostream & _ostr;
@@ -14,5 +16,7 @@ public:
 
     void print(std::string str);
 };
+
+}
 
 #endif  // PRINTER_H_

@@ -20,13 +20,13 @@ Things this project can do
     - Support inclusion via `find_package`
     - Build tests
     - Run tests
-
-
-Things this project should do
-
     - Configure projects with version info
     - Store semver code in binary
     - Store git hash in binary
+
+Things this project should do
+
+
     - Build documentation
     - Install documentation
     - Auto-convert gtest/catch unit tests to ctest

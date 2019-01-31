@@ -4,13 +4,14 @@
 #define APPEND_ENDLINE 1
 #endif
 
-Printer::Printer(std::ostream & ostr)
+printer::Printer::Printer(std::ostream & ostr)
 : _ostr(ostr)
 {
 }
 
 
-void Printer::print(std::string str){
+void 
+printer::Printer::print(std::string str){
     _ostr 
         << str
 #if APPEND_ENDLINE 

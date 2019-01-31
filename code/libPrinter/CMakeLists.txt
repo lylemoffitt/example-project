@@ -8,6 +8,7 @@ project(lib${TARGET}
     VERSION 1.0.0 
     LANGUAGES CXX
 )
+# set(PROJECT_VERSION ${${PROJECT_NAME}_VERSION})
 
 # Include guard prevents double definition of target
 if(TARGET ${TARGET})
@@ -34,32 +35,55 @@ set(opt_${TARGET}_with_newline
 
 # Get git hash and description for current commit
 execute_process(
-    COMMAND "git rev-parse HEAD"
+    COMMAND git rev-parse HEAD
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 execute_process(
-    COMMAND "git rev-parse --short HEAD"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_HASH_SHORT
-)
-execute_process(
-    COMMAND "git describe"
+    COMMAND git describe
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE GIT_DESC
     ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(
+    COMMAND git remote
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_REMOTE
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(
+    COMMAND git remote get-url ${GIT_REMOTE}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_REMOTE_URL
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+execute_process(
+    COMMAND git diff --quiet
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    RESULT_VARIABLE GIT_DIRTY
 )
 # Configure the version file
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
-    version.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
 )
 
 # Put together list of all source files
 file(GLOB src_files
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
 )
 
 

@@ -1,9 +1,10 @@
-#ifndef PRINTER_LIBRARY_H_
-#define PRINTER_LIBRARY_H_
+#ifndef PRINTER_H_
+#define PRINTER_H_
 
 #include <ostream>
 #include <string>
 
+#include "printer_lib/version.h"
 
 class Printer{
     std::ostream & _ostr;
@@ -14,4 +15,4 @@ public:
     void print(std::string str);
 };
 
-#endif  // PRINTER_LIBRARY_H_
+#endif  // PRINTER_H_

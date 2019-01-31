@@ -32,10 +32,34 @@ set(opt_${TARGET}_with_newline
     "Append newline to every call to printer."
 )
 
+# Get git hash and description for current commit
+execute_process(
+    COMMAND "git rev-parse HEAD"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_HASH
+)
+execute_process(
+    COMMAND "git rev-parse --short HEAD"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_HASH_SHORT
+)
+execute_process(
+    COMMAND "git describe"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_DESC
+    ERROR_QUIET
+)
+# Configure the version file
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
+    version.cpp
+)
+
 # Put together list of all source files
 file(GLOB src_files
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
 )
 
 
@@ -200,4 +224,3 @@ write_basic_package_version_file(
     # foreach (_variableName ${_variableNames})
     #     message(STATUS "${_variableName}=${${_variableName}}")
     # endforeach()
-    

@@ -28,4 +28,9 @@ TEST(HelloTest, print_hello_get_hello) {
     EXPECT_STREQ(expected, ss.str().c_str());
 }
 
+TEST(HelloTest, version_check) {
+
+    EXPECT_STREQ("1.0.0", version::semver());
+}
+
 } // namespace

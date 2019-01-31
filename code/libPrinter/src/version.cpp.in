@@ -1,0 +1,49 @@
+#include "printer_lib/version.h"
+
+
+
+constexpr static const char * SEMVER = 
+    "@libPrinter_VERSION@";
+
+constexpr static const char * GIT_HASH = 
+    "@GIT_HASH@";
+constexpr static const char * GIT_HASH_SHORT = 
+    "@GIT_HASH_SHORT@";
+constexpr static const char * GIT_DESC = 
+    "@GIT_DESC@";
+
+constexpr static const char * VERSION_STRING_LONG = 
+    "@PROJECT_NAME@-@libPrinter_VERSION@-@GIT_HASH@";
+constexpr static const char * VERSION_STRING_SHORT = 
+    "@PROJECT_NAME@-@libPrinter_VERSION@-@GIT_HASH_SHORT@";
+constexpr static const char * VERSION_DESC = 
+    "@PROJECT_NAME@-@GIT_DESC@";
+
+constexpr const char * 
+version::semver(){
+    return "@libPrinter_VERSION@";
+}
+
+constexpr const char * 
+version::hash(){
+    return "@GIT_HASH@";
+}
+
+constexpr const char * 
+version::short_hash(){
+    return "@GIT_HASH_SHORT@";
+}
+
+constexpr const char * 
+version::git_desc(){
+    return "@GIT_DESC@";
+}
+
+constexpr version::version_t 
+version::version(){
+    return version_t{
+        .major = @libPrinter_VERSION_MAJOR@,
+        .minor = @libPrinter_VERSION_MINOR@,
+        .patch = @libPrinter_VERSION_PATCH@
+    };
+}

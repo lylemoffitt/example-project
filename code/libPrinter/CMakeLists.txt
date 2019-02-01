@@ -74,16 +74,20 @@ execute_process(
     RESULT_VARIABLE GIT_DIRTY
 )
 # Configure the version file
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
+configure_file( # Static binary version block
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version_block.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/src/version_block.cpp
+)
+configure_file( # Runtime Version API
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version_api.cpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/src/version_api.cpp
 )
 
 # Put together list of all source files
 file(GLOB src_files
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/src/version.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/src/*.cpp
 )
 
 
@@ -109,6 +113,7 @@ target_include_directories(${TARGET}
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
 
     # Properties that are hidden from the consumer.
     #   - Available under the PRIVATE_ prefix
@@ -116,6 +121,7 @@ target_include_directories(${TARGET}
     PRIVATE
         # ${CMAKE_CURRENT_SOURCE_DIR}/src
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
 )
 
 # Set compiler options for this target

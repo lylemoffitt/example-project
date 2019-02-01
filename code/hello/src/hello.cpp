@@ -23,20 +23,36 @@ int main(int argc, char** argv) {
 
     po::options_description desc("Allowed options");
     desc.add_options()
-        ("help,h", "print usage message");
+        ("help,h", "print usage message")
+        ("version,v", "print version string")
+    ;
 
     po::variables_map vm;
     try {
-        store(parse_command_line(argc, argv, desc), vm);
-
-        Printer printer(std::cout);
+        po::store(parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+        
+        printer::Printer printer(std::cout);
         if (vm.count("help")) {
             printer.print(usage());
             return 0;
-        } else {
-            
-            printer.print(greeting + greeted);
         }
+        if (vm.count("version")){
+            using p_vs = version::project;
+            using g_vs = version::git;
+            auto dirty_str = [](bool dirty)->std::string {
+                return dirty ? "dirty" : "clean";
+            };
+            std::cout 
+                << p_vs::name() << " v" << p_vs::semver()
+                << "\n\t" 
+                << "from: " 
+                << g_vs::url() << " @ " << g_vs::hash() << "-" << dirty_str(g_vs::dirty)
+                << std::endl;
+            return 0;
+        }
+
+        printer.print(greeting + greeted);
     } catch (po::error& e) {
         std::cerr 
             << "ERROR: " 

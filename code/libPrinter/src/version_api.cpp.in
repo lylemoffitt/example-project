@@ -1,0 +1,63 @@
+#include "printer_lib/version_api.h"
+
+
+namespace version{
+
+
+const char *
+project::name(){
+    return "@PROJECT_NAME@";
+}
+
+const char *
+project::semver(){
+    return "@PROJECT_VERSION@";
+}
+
+project::data_t 
+project::data(){
+    return data_t{
+        .name   = name(),
+        .major  = @PROJECT_VERSION_MAJOR@,
+        .minor  = @PROJECT_VERSION_MINOR@,
+        .patch  = @PROJECT_VERSION_PATCH@,
+    };
+}
+
+
+const char *
+git::desc(){
+    return "@GIT_DESC@";
+}
+
+const char *
+git::url(){
+    return "@GIT_REMOTE_URL@";
+}
+
+const char *
+git::branch(){
+    return "@GIT_BRANCH@";
+}
+
+const char *
+git::hash(){
+    return "@GIT_HASH@";
+}
+
+const bool
+git::dirty(){
+    return @GIT_DIRTY@;
+}
+
+git::data_t 
+git::data(){
+    return data_t{
+        .url    = url(),
+        .branch = branch(),
+        .hash   = hash(),
+        .dirty  = dirty(),
+    };
+}
+
+} // namespace version

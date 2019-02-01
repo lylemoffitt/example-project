@@ -4,9 +4,20 @@
 #include <ostream>
 #include <string>
 
-#include <printer_lib/version.h>
+#include <printer_lib/version_api.h>
+
 
 namespace printer {
+
+
+
+
+// struct version{
+//     static project_version project;
+//     static git_version git;
+// };
+// using project_version = project_version;
+// using git_version = git_version;
 
 class Printer{
     std::ostream & _ostr;

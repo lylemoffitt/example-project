@@ -19,7 +19,7 @@ Things this project can do:
 - Support inclusion via `add_subdirectory`
 - Support inclusion via `find_package`
 - Build tests
-- Run tests
+- Run tests (via direct exec)
 - Configure projects with version info
 - Store semver code in binary
 - Store git hash in binary
@@ -44,13 +44,12 @@ Things this project _could_ do:
 - Run linters as prebuild step
 - Support pre-compiled header
 - Package tarballs
-- 
 
 
 ## Mirroring heterogeneous projects
 
 1) Proxy project via extension via a cmake lists into the normal project
-    - the eproject is linked as a submodule and linked via deps
+    - the project is linked as a submodule and linked via deps
 
 2) Top level cmake just points straight into submodules and includes it directly
 
@@ -59,4 +58,6 @@ Things this project _could_ do:
 
 ## Catkin Project structure
 
-Src folder structure is inforced
+Note: 
+    - `/src` folder structure is enforced
+    - `/devel` and `/build` are reserved under catkin workspace

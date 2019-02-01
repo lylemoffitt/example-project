@@ -1,5 +1,7 @@
-#ifndef VERSION_H_
-#define VERSION_H_
+#ifndef VERSION_CT_API_H_
+#define VERSION_CT_API_H_
+
+namespace version {
 
 /** CMake Project Version Info
  * \desc 
@@ -7,19 +9,23 @@
  *      Information is populated at configuration time 
  *      and is available at compile time.
  */
-struct project_version{
-    constexpr project_version();
+struct project{
+    constexpr project();
 
     /// Project Name
     /// \desc As recorded in PROJECT_NAME
-    constexpr static const char *   name();
+    constexpr static const char *   name(){
+        return "@PROJECT_NAME@";
+    }
 
     /// Project Version
     /// \desc As recorded in PROJECT_VERSION
-    constexpr static const char *   semver();
+    constexpr static const char *   semver(){
+        return "@PROJECT_VERSION@";
+    }
 
     /// Project Data
-    struct version_data{
+    struct data_t{
 
         /// The name of the project
         /// \desc As recorded in PROJECT_NAME
@@ -39,7 +45,14 @@ struct project_version{
     };
 
     /// Project Data
-    constexpr static version_data data();
+    constexpr static data_t data(){
+        return data_t{
+            .name   = name(),
+            .major  = @PROJECT_VERSION_MAJOR@,
+            .minor  = @PROJECT_VERSION_MINOR@,
+            .patch  = @PROJECT_VERSION_PATCH@,
+        };
+    }
 };
 
 /** Git Repo Version Info
@@ -48,31 +61,41 @@ struct project_version{
  *      Information is populated at configuration time 
  *      and  is available at compile time.
  */
-struct git_version{
-    constexpr git_version();
+struct git{
+    constexpr git();
 
     /// Git description
     /// \desc As provided by `git describe`
-    constexpr static const char *   desc();
+    constexpr static const char *   desc(){
+        return "@GIT_DESC@";
+    }
 
     /// Git remote url
     /// \desc As provided by `git remote get-url $(git remote)`
-    constexpr static const char *   url();
+    constexpr static const char *   url(){
+        return "@GIT_REMOTE_URL@";
+    }
 
     /// Git source branch
     /// \desc As provided by `git rev-parse --abbrev-ref HEAD`
-    constexpr static const char *   branch();
+    constexpr static const char *   branch(){
+        return "@GIT_BRANCH@";
+    }
 
     /// Git commit hash
     /// \desc As provided by `git rev-parse HEAD`
-    constexpr static const char *   hash();
+    constexpr static const char *   hash(){
+        return "@GIT_HASH@";
+    }
 
     /// Git working state
     /// \desc As provided by `git diff --quiet`
-    constexpr static const bool     dirty();
+    constexpr static const bool     dirty(){
+        return @GIT_DIRTY@;
+    }
 
     /// Git version data
-    struct git_data{
+    struct data_t{
 
         /// Git remote url
         /// \desc As provided by `git remote get-url $(git remote)`
@@ -92,9 +115,17 @@ struct git_version{
     };
 
     /// Git version data
-    constexpr static git_data data();
+    constexpr static data_t data(){
+        return data_t{
+            .url    = url(),
+            .branch = branch(),
+            .hash   = hash(),
+            .dirty  = dirty(),
+        };
+    }
 
 };
 
+} //namespace version
 
-#endif // VERSION_H_
+#endif // VERSION_CT_API_H_

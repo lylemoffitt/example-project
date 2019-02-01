@@ -1,0 +1,32 @@
+
+/* Version information string to be encoded in the BSS data segment.
+
+This information can be later extracted with `strings`. To parse out 
+the JSON encoded metadata use a `sed` script. Ex:
+ 
+    # Select lines between META tags
+    /META_BEGIN/,/META_END/ {
+        # Delete tags
+        /META_BEGIN/ d
+        /META_END/ d
+        # Print remainder
+        p
+    }
+*/
+static const char * VERSION_BLOCK =
+"META_BEGIN\n"
+"{"
+    "\"project\":{"
+        "\"name\":\"@PROJECT_NAME@\","
+        "\"version\":\"@PROJECT_VERSION@\""
+    "},"
+    "\"git\":{"
+        "\"url\":\"@GIT_REMOTE_URL@\","
+        "\"branch\":\"@GIT_BRANCH@\","
+        "\"commit\":\"@GIT_HASH@\","
+        "\"description\":\"@GIT_DESC@\","
+        "\"dirty\":@GIT_DIRTY@"
+    "}"
+"}"
+"\nMETA_END"
+;

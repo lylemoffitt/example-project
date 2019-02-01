@@ -20,7 +20,7 @@ namespace {
 
 TEST(HelloTest, print_hello_get_hello) {
     std::stringstream ss;
-    Printer printer(ss);
+    printer::Printer printer(ss);
     printer.print("hello");
 
     const char expected[] = "hello" NL_STR;
@@ -30,7 +30,7 @@ TEST(HelloTest, print_hello_get_hello) {
 
 TEST(HelloTest, version_check) {
 
-    EXPECT_STREQ("1.0.0", version::semver());
+    EXPECT_STREQ("1.0.0", version::project::semver());
 }
 
 } // namespace

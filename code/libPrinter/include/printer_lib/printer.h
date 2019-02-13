@@ -4,7 +4,7 @@
 #include <ostream>
 #include <string>
 
-#include <printer_lib/version_api.h>
+#include <version_api.h>
 
 
 namespace printer {

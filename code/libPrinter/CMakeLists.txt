@@ -37,30 +37,17 @@ set(opt_${TARGET}_with_newline
 )
 
 # Get git hash and description for current commit
-include(GitVersionInfo)
-
-git_commit_hash(GIT_HASH)
-git_describe(GIT_DESC)
-git_remote_url(GIT_REMOTE_URL)
-git_current_branch(GIT_BRANCH)
-git_local_changes(GIT_DIRTY)
-
-
-# Configure the version file
-configure_file( # Static binary version block
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/version_block.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/src/version_block.cpp
-)
-configure_file( # Runtime Version API
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/version_api.cpp.in
-    ${CMAKE_CURRENT_BINARY_DIR}/src/version_api.cpp
-)
+include(VersionAPI)
+generate_version_block(VERSION_BLOCK_SRC)
+generate_version_rt_api(VERSION_RT_API_SRC, VERSION_RT_API_INCLUDE)
+generate_version_ct_api(VERSION_CT_API_INCLUDE)
 
 # Put together list of all source files
 file(GLOB src_files
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/src/*.cpp
+    ${VERSION_BLOCK_SRC}/*.cpp
+    ${VERSION_RT_API_SRC}/*.cpp
 )
 
 
@@ -86,7 +73,8 @@ target_include_directories(${TARGET}
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
+        $<BUILD_INTERFACE:${VERSION_RT_API_INCLUDE}>
+        $<BUILD_INTERFACE:${VERSION_CT_API_INCLUDE}>
 
     # Properties that are hidden from the consumer.
     #   - Available under the PRIVATE_ prefix
@@ -94,7 +82,8 @@ target_include_directories(${TARGET}
     PRIVATE
         # ${CMAKE_CURRENT_SOURCE_DIR}/src
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
+        $<BUILD_INTERFACE:${VERSION_BLOCK_SRC}>
+        $<BUILD_INTERFACE:${VERSION_RT_API_SRC}>
 )
 
 # Set compiler options for this target

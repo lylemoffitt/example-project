@@ -38,14 +38,24 @@
 
 # https://github.com/rpavlik/cmake-modules/tree/38131f4c7b0914b450c5d03396954629eb13c537/GetGitRevisionDescription.cmake
 
-if(__get_git_revision_description)
+if(__GitHeadReference_include_guard)
 	return()
 endif()
-set(__get_git_revision_description YES)
+set(__GitHeadReference_include_guard YES)
 
-# We must run the following at "include" time, not at function call time,
-# to find the path to this module rather than the path to a calling list file
-get_filename_component(_gitdescmoddir ${CMAKE_CURRENT_LIST_FILE} PATH)
+
+
+# Resolve this (likely symlinked) module file to its realpath
+get_filename_component(__GitHeadReference_PATH
+    ${CMAKE_CURRENT_LIST_FILE}
+    REALPATH
+)
+
+# Convert real module path to module directory
+get_filename_component(__GitHeadReference_DIR 
+    ${__GitHeadReference_PATH}
+    DIRECTORY
+)
 
 function(get_git_head_revision _refspecvar _hashvar)
 	set(GIT_PARENT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -79,7 +89,7 @@ function(get_git_head_revision _refspecvar _hashvar)
 	set(HEAD_FILE "${GIT_DATA}/HEAD")
 	configure_file("${GIT_DIR}/HEAD" "${HEAD_FILE}" COPYONLY)
 
-	configure_file("${_gitdescmoddir}/GetGitRevisionDescription.cmake.in"
+	configure_file("${__GitHeadReference_DIR}/res/GitHeadReference.cmake.in"
 		"${GIT_DATA}/grabRef.cmake"
 		@ONLY)
 	include("${GIT_DATA}/grabRef.cmake")

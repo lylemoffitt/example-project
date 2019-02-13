@@ -1,6 +1,7 @@
 #ifndef VERSION_CT_API_H_
 #define VERSION_CT_API_H_
 
+
 namespace version {
 
 /** CMake Project Version Info

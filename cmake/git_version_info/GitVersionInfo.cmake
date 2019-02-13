@@ -1,7 +1,31 @@
 
-include(GetGitRevisionDescription)
+# Prevent multiple includes per project
+if(__GitVersionInfo_include_guard)
+	return()
+endif()
+set(__GitVersionInfo_include_guard YES)
 
 
+# Resolve this (likely symlinked) module file to its realpath
+get_filename_component(__GitVersionInfo_PATH
+    ${CMAKE_CURRENT_LIST_FILE}
+    REALPATH
+)
+
+# Convert real module path to module directory
+get_filename_component(__GitVersionInfo_DIR 
+    ${__GitVersionInfo_PATH}
+    DIRECTORY
+)
+
+list(APPEND CMAKE_MODULE_PATH "${__GitVersionInfo_DIR}/import/")
+
+include(GitHeadReference)
+
+
+#[=============================================================================[
+    git_commit_hash( <out_var> )
+#]=============================================================================]
 function(git_commit_hash _out_var_)
     get_git_head_revision(refspec hash)
     if(NOT hash)
@@ -18,6 +42,9 @@ function(git_commit_hash _out_var_)
 endfunction(git_commit_hash)
 
 
+#[=============================================================================[
+    git_describe( <out_var> )
+#]=============================================================================]
 function(git_describe _out_var_)
     get_git_head_revision(refspec hash)
     if(NOT hash)
@@ -35,6 +62,9 @@ function(git_describe _out_var_)
 endfunction(git_describe)
 
 
+#[=============================================================================[
+    git_remote_url( <out_var> )
+#]=============================================================================]
 function(git_remote_url _out_var_)
     execute_process(
         COMMAND git remote
@@ -54,6 +84,9 @@ function(git_remote_url _out_var_)
 endfunction(git_remote_url)
 
 
+#[=============================================================================[
+    git_current_branch( <out_var> )
+#]=============================================================================]
 function(git_current_branch _out_var_)
     get_git_head_revision(refspec hash)
     if(NOT hash)
@@ -71,6 +104,9 @@ function(git_current_branch _out_var_)
 endfunction(git_current_branch)
 
 
+#[=============================================================================[
+    git_local_changes( <out_var> )
+#]=============================================================================]
 function(git_local_changes _out_var_)
     get_git_head_revision(refspec hash)
     if(NOT hash)
